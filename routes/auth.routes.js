@@ -13,6 +13,7 @@ router.post('/signup', async(req, res)=>{
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body. email,
+            description: req.body.description,
             password: hashedPassword,
             role: req.body.role
         }
@@ -20,7 +21,7 @@ router.post('/signup', async(req, res)=>{
         res.status(201).json(createdUser);
         
     } catch (error) {
-        console.log(error);
+        
         res.status(500).json(error);
         
     }
@@ -37,7 +38,7 @@ router.post('/login', async(req, res) => {
             if(!doesPasswordMatch){
                 res.status(403).json({errorMessage:"Password does not match"});
             }else{
-                const data = {_id: foundUser._id};
+                const data = {_id: foundUser._id, role: foundUser.role};
                 const authToken = jwt.sign(data, process.env.TOKEN_SECRET,{
                     algorithm:"HS256",
                     expiresIn:"6h"
@@ -49,14 +50,14 @@ router.post('/login', async(req, res) => {
         
     } 
     catch (error) {
-         console.log(error);
+         
         res.status(500).json(error);
     }
 })
 
 router.get('/verify', isAuthenticated, (req, res)=>{
     if(req.payload)
-    {res.status(200).json({message:"Token valid"})}
+    {res.status(200).json({message:"Token valid", payload: req.payload})}
     else{
         res.status(400).json({errorMessage:"Token does not valid"})
     }
