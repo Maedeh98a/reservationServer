@@ -2,6 +2,8 @@ const router = require("express").Router();
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require("../models/User.model");
+const DoctorModel = require("../models/Doctor.model");
+const PatientModel = require("../models/Patient.model")
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 
@@ -38,6 +40,8 @@ router.post('/login', async(req, res) => {
             if(!doesPasswordMatch){
                 res.status(403).json({errorMessage:"Password does not match"});
             }else{
+                // const doctorId = await DoctorModel.findOne({user: foundUser._id});
+                // const patientId = await PatientModel.findOne({user: foundUser._id});
                 const data = {_id: foundUser._id, role: foundUser.role};
                 const authToken = jwt.sign(data, process.env.TOKEN_SECRET,{
                     algorithm:"HS256",
