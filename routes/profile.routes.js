@@ -2,7 +2,9 @@ const router = require("express").Router();
 const doctorModel = require("../models/Doctor.model");
 const patientModel = require("../models/Patient.model");
 const userModel = require("../models/User.model");
+const timeSlot = require("../models/TimeSlot.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const { act } = require("react");
 
 router.get("/:userId", async (req, res)=>{
     try {
@@ -43,6 +45,37 @@ router.post('/createDoctor', isAuthenticated, async (req, res)=>{
         res.status(400).json(error);
     }
    
+})
+
+router.post("/availability", isAuthenticated, async (req, res)=>{
+    try {
+        const doctorId = req.payload.doctorId;
+        const {date, start, end} =req.body;
+        const newSlot = await timeSlot.create({
+            doctor: doctorId, 
+            date, 
+            start, 
+            end
+        });
+        await doctorModel.findByIdAndUpdate(doctorId,{
+            $push:{availabilities: newSlot._id}},
+            {new: true}
+        )
+        res.status(201).json(newSlot)
+        
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
+    try {
+        const doctorAvailabilities = await timeSlot.find({doctor: req.params.doctorId});
+         res.status(200).json(doctorAvailabilities);
+
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 module.exports = router;

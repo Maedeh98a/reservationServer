@@ -40,9 +40,9 @@ router.post('/login', async(req, res) => {
             if(!doesPasswordMatch){
                 res.status(403).json({errorMessage:"Password does not match"});
             }else{
-                // const doctorId = await DoctorModel.findOne({user: foundUser._id});
-                // const patientId = await PatientModel.findOne({user: foundUser._id});
-                const data = {_id: foundUser._id, role: foundUser.role};
+                const doctorId = await DoctorModel.findOne({user: foundUser._id});
+                const patientId = await PatientModel.findOne({user: foundUser._id});
+                const data = {_id: foundUser._id, role: foundUser.role, doctorId: doctorId?._id, patientId: patientId?._id};
                 const authToken = jwt.sign(data, process.env.TOKEN_SECRET,{
                     algorithm:"HS256",
                     expiresIn:"6h"
