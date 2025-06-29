@@ -25,6 +25,8 @@ router.get('/doctor/:doctorId', async (req, res)=>{
     }
    
 })
+
+
 router.get('/patient/:patientId', async (req, res)=>{
     try {
         const patientFound = await patientModel.findById(req.params.patientId).populate('user');
@@ -78,4 +80,22 @@ router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
     }
 })
 
+router.put("/updateDoctor", isAuthenticated, async (req, res)=>{
+    try {
+        const doctorId = req.payload.doctorId;
+        const updatedProfile = await doctorModel.findByIdAndUpdate(doctorId, req.body, {new: true});
+        res.status(201).json(updatedProfile);
+    } catch (error) {
+        console.log(error);
+    }
+})
+router.delete("/deleteDoctor", isAuthenticated, async(req, res)=>{
+    try {
+        const doctorId = req.payload.doctorId;
+        const deletedDoctor = await doctorModel.findByIdAndDelete(doctorId);
+        res.status(201).json(deletedDoctor);
+    } catch (error) {
+        console.log(error);
+    }
+})
 module.exports = router;
