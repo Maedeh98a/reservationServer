@@ -26,17 +26,6 @@ router.get('/doctor/:doctorId', async (req, res)=>{
    
 })
 
-
-router.get('/patient/:patientId', async (req, res)=>{
-    try {
-        const patientFound = await patientModel.findById(req.params.patientId).populate('user');
-        res.status(200).json(patientFound)
-
-    } catch (error) {
-        res.status(400).json(error);
-    }
-   
-})
 router.post('/createDoctor', isAuthenticated, async (req, res)=>{
     try {
        
@@ -49,36 +38,6 @@ router.post('/createDoctor', isAuthenticated, async (req, res)=>{
    
 })
 
-router.post("/availability", isAuthenticated, async (req, res)=>{
-    try {
-        const doctorId = req.payload.doctorId;
-        const {date, start, end} =req.body;
-        const newSlot = await timeSlot.create({
-            doctor: doctorId, 
-            date, 
-            start, 
-            end
-        });
-        await doctorModel.findByIdAndUpdate(doctorId,{
-            $push:{availabilities: newSlot._id}},
-            {new: true}
-        )
-        res.status(201).json(newSlot)
-        
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
-    try {
-        const doctorAvailabilities = await timeSlot.find({doctor: req.params.doctorId});
-         res.status(200).json(doctorAvailabilities);
-
-    } catch (error) {
-        console.log(error);
-    }
-})
 
 router.put("/updateDoctor", isAuthenticated, async (req, res)=>{
     try {
@@ -98,4 +57,36 @@ router.delete("/deleteDoctor", isAuthenticated, async(req, res)=>{
         console.log(error);
     }
 })
+
+
+router.get('/patient/:patientId', async (req, res)=>{
+    try {
+        const patientFound = await patientModel.findById(req.params.patientId).populate('user');
+        res.status(200).json(patientFound)
+
+    } catch (error) {
+        res.status(400).json(error);
+    }
+   
+})
+
+router.post('/createPatient', isAuthenticated, async (req, res)=>{
+    try {
+       const patientInfo = await patientModel.create(req.body);
+       res.status(201).json(patientInfo); 
+    } catch (error) {
+        res.status(400).json(error);
+    }
+})
+
+router.put('/updatePatient', isAuthenticated, async (req, res)=>{
+    try {
+        const patientId = req.payload.patientId
+        const updatedPatient = await patientModel.findByIdAndUpdate(patientId, req.body, {new:true});
+        res.status(201).json(updatedPatient);
+    } catch (error) {
+        res.status(400).json(error);
+    }
+})
+
 module.exports = router;
