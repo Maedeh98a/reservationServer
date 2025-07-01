@@ -4,7 +4,7 @@ const patientModel = require("../models/Patient.model");
 const userModel = require("../models/User.model");
 const timeSlot = require("../models/TimeSlot.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
-const { act } = require("react");
+
 
 
 router.get("/doctors", async(req, res)=>{
