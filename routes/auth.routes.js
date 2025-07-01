@@ -8,7 +8,7 @@ const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 
 router.post('/signup', async(req, res)=>{
-    try {
+    // try {
         const theSalt = bcryptjs.genSaltSync(12);
         const hashedPassword = bcryptjs.hashSync(req.body.password, theSalt);
         const hashedUser = {
@@ -22,11 +22,11 @@ router.post('/signup', async(req, res)=>{
         const createdUser = await UserModel.create(hashedUser);
         res.status(201).json(createdUser);
         
-    } catch (error) {
+    // } catch (error) {
         
-        res.status(500).json(error);
+    //     res.status(500).json(error);
         
-    }
+    // }
 })
 
 router.post('/login', async(req, res) => {
