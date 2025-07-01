@@ -6,15 +6,16 @@ const timeSlot = require("../models/TimeSlot.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 const { act } = require("react");
 
-router.get("/:userId", async (req, res)=>{
+
+router.get("/doctors", async(req, res)=>{
     try {
-        const userFound = await userModel.findById(req.params.userId);
-        res.status(200).json(userFound);
+        const allDoctors = await doctorModel.find().populate('user');
+        res.status(200).json(allDoctors);
+    
     } catch (error) {
-        res.status(400).json(error);
+        console.log("this",error);
     }
 })
-
 router.get('/doctor/:doctorId', async (req, res)=>{
     try {
         const doctorFound = await doctorModel.findById(req.params.doctorId).populate('user');
@@ -58,7 +59,23 @@ router.delete("/deleteDoctor", isAuthenticated, async(req, res)=>{
     }
 })
 
+router.get("/:userId", async (req, res)=>{
+    try {
+        const userFound = await userModel.findById(req.params.userId);
+        res.status(200).json(userFound);
+    } catch (error) {
+        res.status(400).json(error);
+    }
+})
 
+router.put("/updateUser", isAuthenticated, async (req, res)=>{
+    try {
+        const updatedUser = await userModel.findByIdAndUpdate(req.params.userId, req.body, {new: true});
+        res.status(200).json(updatedUser);        
+    } catch (error) {
+        res.status(400).json(error);
+    }
+})
 router.get('/patient/:patientId', async (req, res)=>{
     try {
         const patientFound = await patientModel.findById(req.params.patientId).populate('user');
