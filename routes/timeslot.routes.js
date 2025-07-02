@@ -2,7 +2,7 @@ const router = require("express").Router();
 const doctorModel = require("../models/Doctor.model");
 const patientModel = require("../models/Patient.model");
 const userModel = require("../models/User.model");
-const timeSlot = require("../models/TimeSlot.model");
+const timeSlotModel = require("../models/TimeSlot.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 
@@ -11,7 +11,7 @@ router.post("/availability", isAuthenticated, async (req, res)=>{
     try {
         const doctorId = req.payload.doctorId;
         const {date, start, end} =req.body;
-        const newSlot = await timeSlot.create({
+        const newSlot = await timeSlotModel.create({
             doctor: doctorId, 
             date, 
             start, 
@@ -30,7 +30,7 @@ router.post("/availability", isAuthenticated, async (req, res)=>{
 
 router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
     try {
-        const doctorAvailabilities = await timeSlot.find({doctor: req.params.doctorId});
+        const doctorAvailabilities = await timeSlotModel.find({doctor: req.params.doctorId});
          res.status(200).json(doctorAvailabilities);
 
     } catch (error) {
@@ -40,7 +40,7 @@ router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
 
 router.put("/updateTimeslot/:itemId", isAuthenticated, async(req, res)=>{
     try {
-        const updatedTimeslot = await timeSlot.findByIdAndUpdate(req.params.itemId, {
+        const updatedTimeslot = await timeSlotModel.findByIdAndUpdate(req.params.itemId, {
             date: req.body.date,
             start: req.body.start,
             end: req.body.end
@@ -52,6 +52,34 @@ router.put("/updateTimeslot/:itemId", isAuthenticated, async(req, res)=>{
     }
 })
 
+router.post("/:timeslotId/reserve", isAuthenticated, async (req, res)=>{
+    try {
+        const timeslotId = req.params.timeslotId;
+        const userId = req.payload._id;
+        const patientId = req.payload.patientId;
+        if (!patientId) {
+        return res.status(403).json({ message: "Only patients can book time slots" });
+    }
+    const timeslot = await timeSlotModel.findById(timeslotId);
+    if (!timeslot) {
+      return res.status(404).json({ message: "Time slot not found" });
+    }
+    if (timeslot.isBooked) {
+      return res.status(400).json({ message: "This time slot is already booked" });
+    }
+    timeslot.bookedBy = patientId;
+    timeslot.isBooked = true
+    await timeslot.save();
+
+    await patientModel.findByIdAndUpdate(patientId,{
+        $push:{reservation: timeslot._id}
+    })
+
+    res.status(201).json("timeslot successfully reserved")
+    } catch (error) {
+        console.log(error)
+    }
+})
 router.delete("/deleteTimeslot/:itemId", isAuthenticated , async(req, res)=>{
     try {
         const deletedTimeslot = await timeSlot.findByIdAndDelete(req.params.itemId);
