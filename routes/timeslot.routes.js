@@ -28,7 +28,7 @@ router.post("/availability", isAuthenticated, async (req, res)=>{
     }
 })
 
-router.get("/availability/:doctorId", isAuthenticated, async (req, res)=>{
+router.get("/availability/:doctorId", async (req, res)=>{
     try {
         const doctorAvailabilities = await timeSlotModel.find({doctor: req.params.doctorId});
          res.status(200).json(doctorAvailabilities);
