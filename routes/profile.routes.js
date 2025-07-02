@@ -27,10 +27,10 @@ router.get('/doctor/:doctorId', async (req, res)=>{
    
 })
 
-router.post('/createDoctor', isAuthenticated, async (req, res)=>{
+router.post('/createDoctor/:userId', async (req, res)=>{
     try {
-       
-        const doctorInfo = await doctorModel.create(req.body);
+        const {userId} = req.params;
+        const doctorInfo = await doctorModel.create({...req.body, user: userId});
         res.status(201).json(doctorInfo)
 
     } catch (error) {
@@ -87,9 +87,10 @@ router.get('/patient/:patientId', async (req, res)=>{
    
 })
 
-router.post('/createPatient', isAuthenticated, async (req, res)=>{
+router.post('/createPatient/:userId', isAuthenticated, async (req, res)=>{
     try {
-       const patientInfo = await patientModel.create(req.body);
+       const {userId} = req.params
+       const patientInfo = await patientModel.create({...req.body, user: userId});
        res.status(201).json(patientInfo); 
     } catch (error) {
         res.status(400).json(error);

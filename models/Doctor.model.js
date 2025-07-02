@@ -9,6 +9,9 @@ const doctorSchema = new Schema({
         type: String,
         required: true
     },
+    address:{
+        type: String
+    },
     startedYear: {
         type: Number, 
         min: 1940,
