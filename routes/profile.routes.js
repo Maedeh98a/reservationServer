@@ -90,16 +90,7 @@ router.put("/updateUser", isAuthenticated, async (req, res)=>{
         res.status(400).json(error);
     }
 })
-router.get('/patient/:patientId', async (req, res)=>{
-    try {
-        const patientFound = await patientModel.findById(req.params.patientId).populate('user');
-        res.status(200).json(patientFound)
 
-    } catch (error) {
-        res.status(400).json(error);
-    }
-   
-})
 
 router.post('/createPatient/:userId', async (req, res)=>{
     try {
@@ -111,6 +102,16 @@ router.post('/createPatient/:userId', async (req, res)=>{
     }
 })
 
+router.get('/patient/:patientId', async (req, res)=>{
+    try {
+        const patientFound = await patientModel.findById(req.params.patientId).populate('user');
+        res.status(200).json(patientFound)
+
+    } catch (error) {
+        res.status(400).json(error);
+    }
+   
+})
 router.put('/updatePatient', isAuthenticated, async (req, res)=>{
     try {
         const patientId = req.payload.patientId
