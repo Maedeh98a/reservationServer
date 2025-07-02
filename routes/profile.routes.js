@@ -43,8 +43,16 @@ router.post('/createDoctor/:userId', async (req, res)=>{
 router.put("/updateDoctor", isAuthenticated, async (req, res)=>{
     try {
         const doctorId = req.payload.doctorId;
-        const updatedProfile = await doctorModel.findByIdAndUpdate(doctorId, req.body, {new: true});
-        res.status(201).json(updatedProfile);
+        const {specialty, address, startedYear, userUpdates} = req.body;
+        const updatedDoctor = await doctorModel.findByIdAndUpdate(doctorId, {specialty, address, startedYear}, {new: true});
+        let updatedUser = null
+        if(userUpdates){
+            updatedUser = await userModel.findByIdAndUpdate(updatedDoctor.user, userUpdates, {new: true})
+        }
+        res.status(201).json({
+            doctor: updatedDoctor,
+            user: updatedUser
+        });
     } catch (error) {
         console.log(error);
     }
@@ -52,8 +60,14 @@ router.put("/updateDoctor", isAuthenticated, async (req, res)=>{
 router.delete("/deleteDoctor", isAuthenticated, async(req, res)=>{
     try {
         const doctorId = req.payload.doctorId;
-        const deletedDoctor = await doctorModel.findByIdAndDelete(doctorId);
-        res.status(201).json(deletedDoctor);
+        const doctor = await doctorModel.findById(doctorId);
+        if(!doctor){
+            res.status(400).json({message: "Doctor not found"})
+        }
+        const userId = doctor.user;
+         await doctorModel.findByIdAndDelete(doctorId);
+         await userModel.findByIdAndDelete(userId);
+        res.status(201).json({message: "Doctor and user deleted successfully"});
     } catch (error) {
         console.log(error);
     }
@@ -100,10 +114,35 @@ router.post('/createPatient/:userId', async (req, res)=>{
 router.put('/updatePatient', isAuthenticated, async (req, res)=>{
     try {
         const patientId = req.payload.patientId
-        const updatedPatient = await patientModel.findByIdAndUpdate(patientId, req.body, {new:true});
-        res.status(201).json(updatedPatient);
+        const {dateOfBirth, history, userUpdates} = req.body;
+        const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {dateOfBirth, history}, {new:true});
+        let updatedUser = null
+        if(userUpdates){
+             updatedUser = await userModel.findByIdAndUpdate(updatedPatient.user, userUpdates, {new:true})
+        }
+        res.status(201).json({
+            patient: updatedPatient,
+            user: updatedUser,
+        });
     } catch (error) {
         res.status(400).json(error);
+    }
+})
+
+
+router.delete("/deletePatient", isAuthenticated, async(req, res)=>{
+    try {
+        const patientId = req.payload.patientId;
+        const patient = await patientModel.findById(patientId);
+        if(!patient){
+            res.status(400).json({message: "Patient not found"})
+        }
+        const userId = patient.user;
+         await patientModel.findByIdAndDelete(patientId);
+         await userModel.findByIdAndDelete(userId);
+        res.status(201).json({message: "Patient and user deleted successfully"});
+    } catch (error) {
+        console.log(error);
     }
 })
 
