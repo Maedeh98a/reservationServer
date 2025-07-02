@@ -87,7 +87,7 @@ router.get('/patient/:patientId', async (req, res)=>{
    
 })
 
-router.post('/createPatient/:userId', isAuthenticated, async (req, res)=>{
+router.post('/createPatient/:userId', async (req, res)=>{
     try {
        const {userId} = req.params
        const patientInfo = await patientModel.create({...req.body, user: userId});
