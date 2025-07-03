@@ -56,7 +56,9 @@ router.post("/:timeslotId/reserve", isAuthenticated, async (req, res)=>{
     try {
         const timeslotId = req.params.timeslotId;
         const userId = req.payload._id;
-        const patientId = req.payload.patientId;
+        const patient = await patientModel.findOne({user: userId});
+        const patientId = patient._id
+        
         if (!patientId) {
         return res.status(403).json({ message: "Only patients can book time slots" });
     }
