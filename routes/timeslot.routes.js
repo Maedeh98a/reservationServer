@@ -84,7 +84,7 @@ router.post("/:timeslotId/reserve", isAuthenticated, async (req, res)=>{
 })
 router.delete("/deleteTimeslot/:itemId", isAuthenticated , async(req, res)=>{
     try {
-        const deletedTimeslot = await timeSlot.findByIdAndDelete(req.params.itemId);
+        const deletedTimeslot = await timeSlotModel.findByIdAndDelete(req.params.itemId);
         res.status(201).json(deletedTimeslot)
     } catch (error) {
         console.log(error)

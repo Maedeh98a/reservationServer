@@ -10,10 +10,7 @@ const patientSchema = new Schema({
         required: true
     },
     history:[String],
-    reservation: {
-        type: Schema.Types.ObjectId,
-        ref: 'TimeSlot'
-    },
+    
     reservation: [{
     type: Schema.Types.ObjectId,
     ref: 'TimeSlot'

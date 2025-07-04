@@ -104,7 +104,12 @@ router.post('/createPatient/:userId', async (req, res)=>{
 
 router.get('/patient/:patientId', async (req, res)=>{
     try {
-        const patientFound = await patientModel.findById(req.params.patientId).populate('user');
+        const patientFound = await patientModel.findById(req.params.patientId).populate('user').populate({
+            path: 'reservation', populate:{
+                path: 'doctor',
+                model: 'DoctorProfile'
+            }
+        });
         res.status(200).json(patientFound)
 
     } catch (error) {
